@@ -10,13 +10,16 @@ use Illuminate\Http\Request;
 class LoginController extends Controller
 {
     public function index() {
+        
+        if(isset(Auth::user()->id)) return redirect()->route('notes.index');
+
         return view('contents.authentication.login');
     }
 
     public function signIn(LoginRequest $request) {
 
         if(Auth::attempt($request->validated())) {
-            return 'Signed in';
+            return redirect()->route('notes.index');
         }
 
         return redirect()->back()->with('error', 'Invalid Credentials.');

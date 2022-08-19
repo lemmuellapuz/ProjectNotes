@@ -1,7 +1,9 @@
 <?php
 
 use App\Http\Controllers\Authentication\LoginController;
+use App\Http\Controllers\Authentication\LogoutController;
 use App\Http\Controllers\Authentication\RegistrationController;
+use App\Http\Controllers\Notes\NotesController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,3 +22,15 @@ Route::post('/', [LoginController::class, 'signIn'])->name('login.attempt');
 
 Route::get('/sign-up', [RegistrationController::class, 'index'])->name('signup');
 Route::post('/sign-up', [RegistrationController::class, 'signUp'])->name('signup.attempt');
+
+Route::middleware('auth')->group(function(){
+
+    Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
+
+    Route::get('notes/list', [NotesController::class, 'table'])->name('notes.table');
+    Route::resource('/notes', NotesController::class);
+    
+});
+
+
+
