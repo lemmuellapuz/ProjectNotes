@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Notes;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Notes\CreateNoteRequest;
+use App\Http\Requests\Notes\SearchQrRequest;
 use App\Http\Requests\Notes\UpdateNoteRequest;
 use App\Models\Note;
 use Illuminate\Support\Facades\Auth;
@@ -29,8 +30,10 @@ class NotesController extends Controller
         })
         ->addColumn('actions', function($row){
 
-            $update_btn = '<a href="'. route('notes.edit', ['note' => $row]) .'" class="btn btn-secondary">Edit</a>';
+            $showqr_btn = '<a onclick="showQr(\''.$row->qr_code.'\')" class="btn btn-primary">Show Qr</a>';
 
+            $update_btn = '<a href="'. route('notes.edit', ['note' => $row]) .'" class="btn btn-secondary">Edit</a>';
+            
             $delete_btn = '
                 <form action="'. route('notes.destroy', ['note' => $row]) .'" method="POST">
                     '.csrf_field().'
@@ -39,7 +42,7 @@ class NotesController extends Controller
                 </form>
             ';
 
-            return $update_btn . $delete_btn;
+            return $update_btn . $showqr_btn . $delete_btn;
         })
         ->rawColumns(['actions'])
         ->make(true);
@@ -53,8 +56,16 @@ class NotesController extends Controller
     public function store(CreateNoteRequest $request)
     {
         try {
+
+            $lastId = Note::orderBy('created_at', 'DESC')->limit(1)->first();
+
+            if($lastId) $lastId = $lastId->id;
+            else $lastId = 1;
+
+            $qr_code = base64_encode(uniqid($lastId, true));
             
             Auth::user()->notes()->create([
+                'qr_code' => $qr_code,
                 'title' => $request->title,
                 'content' => $request->content
             ]);
@@ -66,9 +77,37 @@ class NotesController extends Controller
         }
     }
 
-    public function show($id)
+    public function show(Note $note)
     {
-        //
+        return view('contents.notes.show')->with('note', $note);
+    }
+
+    public function searchQr(SearchQrRequest $request) {
+        
+        try {
+
+            $note = Note::where('qr_code', $request->qr)->first();
+
+            if ($note) {
+                return [
+                    'data' => $note->id,
+                    'status' => 'Success'
+                ];
+            }
+
+            return response()->json([
+                'message' => 'Data not found!',
+                'status' => 'Error'
+            ], 500);
+            
+
+        } catch (\Throwable $th) {
+            return response()->json([
+                'message' => $th->getMessage(),
+                'status' => 'Error'
+            ], 500);
+        }
+
     }
 
     public function edit(Note $note)

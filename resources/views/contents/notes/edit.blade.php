@@ -6,7 +6,7 @@
 
         <h2>Edit Note</h2>
 
-        <a href="{{ route('notes.index') }}">Back</a>
+        <a href="{{ url()->previous() }}">Back</a>
 
         @include('components.alerts')
 

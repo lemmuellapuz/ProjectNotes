@@ -13,6 +13,7 @@ class Note extends Model
 
     protected $fillable = [
         'user_id',
+        'qr_code',
         'title',
         'content',
     ];

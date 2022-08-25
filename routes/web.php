@@ -28,6 +28,7 @@ Route::middleware('auth')->group(function(){
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
     Route::get('notes/list', [NotesController::class, 'table'])->name('notes.table');
+    Route::post('notes/search-qr', [NotesController::class, 'searchQr'])->name('notes.search.via-qr');
     Route::resource('/notes', NotesController::class);
     
 });
