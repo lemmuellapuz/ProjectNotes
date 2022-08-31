@@ -18,6 +18,7 @@ class NoteFactory extends Factory
     {
         return [
             'user_id' => 1,
+            'qr_code' => uniqid(mt_rand(), true),
             'title' => fake()->word(),
             'content' => fake()->sentence(),
         ];

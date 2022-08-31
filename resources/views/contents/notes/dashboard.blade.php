@@ -56,7 +56,7 @@
             serverSide: true,
             ajax: "{{ route('notes.table') }}",
             columns: [
-                { data: 'note_id' },
+                { data: 'id' },
                 { data: 'title' },
                 { data: 'content' },
                 { data: 'actions' }

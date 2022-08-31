@@ -23,6 +23,10 @@
                     <textarea name="content" class="form-input" placeholder="Note" required></textarea>
                 </div>
 
+                <div class="col-12">
+                    <input type="file" name="attachment" id="attachment">
+                </div>
+
                 <div class="col-auto">
                     <input type="submit" value="Add" class="btn btn-success">
                 </div>
@@ -32,5 +36,15 @@
         </form>
 
     </div>
+
+@endsection
+
+@section('script')
+
+<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+<script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-size/dist/filepond-plugin-file-validate-size.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-validate-type/dist/filepond-plugin-file-validate-type.js"></script>
+<script src="{{ asset('js/filepond.js') }}"></script>
 
 @endsection

@@ -7,9 +7,12 @@ use App\Http\Requests\Notes\CreateNoteRequest;
 use App\Http\Requests\Notes\SearchQrRequest;
 use App\Http\Requests\Notes\UpdateNoteRequest;
 use App\Models\Note;
+use App\Models\TemporaryFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-
+use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Carbon;
+use Storage;
 use Yajra\DataTables\Facades\DataTables;
 
 class NotesController extends Controller
@@ -64,11 +67,13 @@ class NotesController extends Controller
 
             $qr_code = base64_encode(uniqid($lastId, true));
             
-            Auth::user()->notes()->create([
+            $note = Auth::user()->notes()->create([
                 'qr_code' => $qr_code,
                 'title' => $request->title,
                 'content' => $request->content
             ]);
+
+            $this->storeAttachment($request, $note);
     
             return redirect()->route('notes.index')->with('success', 'Note added');
             
@@ -111,8 +116,11 @@ class NotesController extends Controller
     }
 
     public function edit(Note $note)
-    {
-        return view('contents.notes.edit')->with('note', $note);
+    {   
+
+        $attachment = $note->attachment()->first();
+
+        return view('contents.notes.edit', compact(['note', 'attachment']));
     }
 
     public function update(UpdateNoteRequest $request, Note $note)
@@ -123,8 +131,10 @@ class NotesController extends Controller
                 'title' => $request->title,
                 'content' => $request->content
             ]);
+
+            $this->storeAttachment($request, $note);
     
-            return redirect()->route('notes.index')->with('success', 'Note updated.');
+            return redirect()->back()->with('success', 'Note updated.');
 
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
@@ -142,5 +152,31 @@ class NotesController extends Controller
         } catch (\Throwable $th) {
             return redirect()->back()->with('error', $th->getMessage());
         }
+    }
+
+    private function storeAttachment($request, $note){
+        
+        if($request->attachment) {
+
+            $attachment = TemporaryFile::where('path', $request->attachment)->first();
+
+            $path = $attachment->path;
+            $filename = $attachment->filename;
+            $extension = $attachment->extension;
+
+            $new_filename = Uuid::uuid4() . '.' . $extension;
+
+            Storage::move('temp/'.$path.'/'.$filename, 'attachments/'.$new_filename);
+            Storage::deleteDirectory('temp/'.$path);
+
+            $attachment->delete();
+
+            $note->attachment()->create([
+                'filename' => $filename,
+                'path' => $new_filename
+            ]);
+
+        }
+
     }
 }
