@@ -38,7 +38,7 @@
             </div>
 
         </form>
-
+        
         @if($attachment)
 
             <div class="col-12">
@@ -102,7 +102,7 @@
                 })
 
                 $.ajax({
-                    url: "{{ route('file.destroy', ['noteAttachment'=> $attachment==''? '#':$attachment ] ) }}",
+                    url: "{{ route('file.destroy', ['noteAttachment'=> $attachment ?: '#' ] ) }}",
                     method: 'POST',
                     data: {
                         '_token': "{{ csrf_token() }}",
