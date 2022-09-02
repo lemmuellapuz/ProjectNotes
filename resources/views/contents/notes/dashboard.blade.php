@@ -144,15 +144,17 @@
 
     function scanQr() {
         $('#qr-scan-modal').modal('show');
+    }
 
+    $('#qr-scan-modal').on('shown.bs.modal', function() {
         html5QrCode.start({ facingMode: { exact: "environment"} }, config, qrCodeSuccessCallback).catch(() => {
             html5QrCode.start({ facingMode: { exact: "user"} }, config, qrCodeSuccessCallback).catch((err) => {
                 alert('No camera found');
             })
         });
-    }
+    })
 
-    $('#qr-scan-modal').on('hidden.bs.modal', function() {
+    $('#qr-scan-modal').on('hide.bs.modal', function() {
         html5QrCode.stop();
     })
 
