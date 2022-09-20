@@ -25,7 +25,7 @@ Route::post('/', [LoginController::class, 'signIn'])->name('login.attempt');
 Route::get('/sign-up', [RegistrationController::class, 'index'])->name('signup');
 Route::post('/sign-up', [RegistrationController::class, 'signUp'])->name('signup.attempt');
 
-Route::middleware('auth')->group(function(){
+Route::middleware(['auth', 'nocache'])->group(function(){
 
     Route::post('/logout', [LogoutController::class, 'logout'])->name('logout');
 
